@@ -124,11 +124,23 @@ def move_to_next_video(screenshot):
         
         # 点击当前位置 (下一个视频)
         pyautogui.click()
-        time.sleep(3)
+        time.sleep(2)
+        if find_image_on_screen("end-play.png", screenshot)[0]:
+                
+                # 向下滚动60
+                pyautogui.scroll(-60)  # 负值表示向下滚动
+                time.sleep(1)  # 等待滚动完成
+                
+                # 点击当前位置 (下一个视频)
+                pyautogui.click() 
+                time.sleep(2)
+                # pyautogui.click(964, 843)
+                # quiken()
         pyautogui.click(964, 843)
         quiken()
+
+
         print("已切换到下一个视频")
-        return True  # 返回True表示已切换到新视频
     else:
         print("未找到当前视频播放按钮")
         return False  # 返回False表示未能切换到新视频
@@ -158,19 +170,32 @@ def handle_unit_test(screenshot):
             
             # 点击当前位置 (下一个视频)
             pyautogui.click()
-            time.sleep(3)
+            time.sleep(2)
             pyautogui.click(964, 843)
-            time.sleep(3)
+            time.sleep(2)
             quiken()
             print("已切换到下一个视频")
             print("单元测试处理完成")
             return True  # 返回True表示已处理事件
+def judge_cuorse_warning(screenshot):   
+    """判断是否出现课程提醒"""
+    course_warning, marked_screenshot = find_image_on_screen("course-warning.png", screenshot)
+    if course_warning:
+            time.sleep(1)
+            pyautogui.click(1174, 764)
+            pyautogui.moveTo(1703, 829) #移动一下鼠标
+            time.sleep(0.5)
+            pyautogui.scroll(100)
+
         
 def quiken():
-     time.sleep(1)
+     pyautogui.moveTo(1000, 843) #移动一下鼠标
+     time.sleep(0.5)
      pyautogui.moveTo(1234, 962)
+     time.sleep(0.5)
      pyautogui.moveTo(1234, 799)
      pyautogui.click()
+     time.sleep(0.5)
 
 def main():
     """主函数"""
@@ -184,7 +209,7 @@ def main():
     print("程序启动，等待20秒后开始...")
     time.sleep(20)  # 初始等待20秒
     pyautogui.click(964, 843)
-    pyautogui.moveTo(1000, 843) #移动一下鼠标
+    time.sleep(1.5)
     quiken()
     
     print("开始监控...")
@@ -198,19 +223,25 @@ def main():
             # 情况1: 检查是否有练习弹窗
             practice_window, marked_screenshot = find_image_on_screen("practice-window.png", screenshot)
             if practice_window:
+                print("1111")
                 handle_practice_window(marked_screenshot)
                 # 处理完弹窗后继续当前视频，不重置计时器
             
             # 情况2: 检查是否到达视频结束
             elif find_image_on_screen("end-play.png", screenshot)[0]:
+                print("2222")
                 print("检测到视频结束")
                 if move_to_next_video(screenshot):
                     restart_timer = True  # 重置计时器标志
                 
             # 情况3: 检查是否有单元测试
             elif find_image_on_screen("unit-test.png", screenshot)[0]:
+                print("3333")
                 if handle_unit_test(screenshot):
                     restart_timer = True
+            elif find_image_on_screen("course-warning.png", screenshot)[0]:
+                print("4444")
+                judge_cuorse_warning(screenshot)      
             
             # 检查是否应该退出
             if exit_program:
