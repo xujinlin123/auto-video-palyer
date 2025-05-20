@@ -124,9 +124,9 @@ def move_to_next_video(screenshot):
         
         # 点击当前位置 (下一个视频)
         pyautogui.click()
-        time.sleep(2)
+        time.sleep(3)
         if find_image_on_screen("end-play.png", screenshot)[0]:
-                
+                print("这次点击到的不是一个视频，点击下一个视频")
                 # 向下滚动60
                 pyautogui.scroll(-60)  # 负值表示向下滚动
                 time.sleep(1)  # 等待滚动完成
@@ -136,13 +136,22 @@ def move_to_next_video(screenshot):
                 time.sleep(2)
                 # pyautogui.click(964, 843)
                 # quiken()
+        elif find_image_on_screen("end-play2.png",screenshot)[0]:
+                print("这次点击到的不是一个视频，点击下一个视频")
+                # 向下滚动60
+                pyautogui.scroll(-60)  # 负值表示向下滚动
+                time.sleep(1)  # 等待滚动完成
+                # 点击当前位置 (下一个视频)
+                pyautogui.click()
+                time.sleep(2)
+                
         pyautogui.click(964, 843)
         quiken()
-
-
         print("已切换到下一个视频")
     else:
         print("未找到当前视频播放按钮")
+        #尝试鼠标滚轮向上滚动60寻找播放按钮
+        pyautogui.scroll(60)
         return False  # 返回False表示未能切换到新视频
 
 def handle_unit_test(screenshot):
@@ -239,10 +248,22 @@ def main():
                 print("3333")
                 if handle_unit_test(screenshot):
                     restart_timer = True
+
+            # 情况4: 检查是否有课程提醒        
             elif find_image_on_screen("course-warning.png", screenshot)[0]:
                 print("4444")
-                judge_cuorse_warning(screenshot)      
+                judge_cuorse_warning(screenshot)  
             
+            # 情况5: 检查是否有第二种结束画面
+            elif find_image_on_screen("end-play2.png",screenshot)[0]:
+                # 判断是否找到这个画面，这个画面是否在视频结束位置，因为是结束画面，隔3秒钟是还可以找到
+                print("5555")
+                print("检查到有第二种结束画面")
+                time.sleep(3)
+                if find_image_on_screen("end-play2.png",screenshot)[0]:
+                    if move_to_next_video(screenshot):
+                        restart_timer = True  # 重置计时器标志
+
             # 检查是否应该退出
             if exit_program:
                 break
